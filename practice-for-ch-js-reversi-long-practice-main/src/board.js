@@ -90,13 +90,10 @@ Board.prototype.isOccupied = function (pos) {
  */
 Board.prototype._positionsToFlip = function (pos, color, dir, piecesToFlip = []) {
   let newPos = [pos[0]+dir[0],pos[1]+dir[1]]
-  if(!this.isValidPos(newPos)) return [];  //returns [] if off board before hitting same piece
-  let piece = this.getPiece(newPos)  
-  if(piece === undefined) return [];    //returns [] if hitting empty space before own piece
-  
-  
+  if(!this.isValidPos(newPos) || !this.getPiece(newPos)) return []  
+  if(this.isMine(newPos, color)) return piecesToFlip;
   piecesToFlip.push(newPos);
-  return this._positionsToFlip(newPos, col, dir, piecesToFlip);
+  return this._positionsToFlip(newPos, color, dir, piecesToFlip);
 
 }
 
@@ -106,7 +103,13 @@ Board.prototype._positionsToFlip = function (pos, color, dir, piecesToFlip = [])
  * color being flipped.
  */
 Board.prototype.validMove = function (pos, color) {
-  // if(!this.isOccupied)
+  if(!this.isValidPos(pos)|| this.getPiece(pos)){
+    return false;
+  }
+  if(Board.DIRS.every((dir) => (this._positionsToFlip(pos, color, dir) === []))){
+    return true;
+  }
+  return false;
 };
 
 /**
